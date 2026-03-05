@@ -32,9 +32,9 @@ services:
       retries: 3
 
   nginx:
-    image: ${APP_IMAGE}
+    image: ${NGINX_IMAGE}
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       app:
         condition: service_healthy
