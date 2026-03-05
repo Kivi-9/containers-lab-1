@@ -79,8 +79,12 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Test the built images
-        run: |
+        run: | 
+          APP_IMAGE=$(echo "ghcr.io/${{ github.repository }}/app:sha-${GITHUB_SHA::7}" | tr '[:upper:]' '[:lower:]')
+          NGINX_IMAGE=$(echo "ghcr.io/${{ github.repository }}/nginx:sha-${GITHUB_SHA::7}" | tr '[:upper:]' '[:lower:]')
+          export APP_IMAGE
+          export NGINX_IMAGE
           docker compose -f docker-compose.test.yml up -d
           sleep 30
           curl -f http://localhost/api/health || exit 1
-          docker compose down
+          docker compose -f docker-compose.test.yml down
