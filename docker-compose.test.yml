@@ -31,7 +31,7 @@ services:
       retries: 3
 
   nginx:
-    image: ghcr.io/${{ github.repository }}/nginx:sha-${{ github.sha }}
+    image: ${APP_IMAGE}
     ports:
       - "8080:80"
     depends_on:
