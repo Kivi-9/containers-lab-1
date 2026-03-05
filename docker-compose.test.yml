@@ -21,7 +21,8 @@ services:
       DB_PASSWORD: secret
       DB_NAME: myapp_test
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - test-network
     healthcheck:
@@ -35,7 +36,8 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     networks:
       - test-network
 networks:
