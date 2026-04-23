@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+    lab: lab2
+spec:
+  replicas: 1  # PostgreSQL обычно работает в одном экземпляре
+  selector:
+    matchLabels:
+      app: postgres
+  # Стратегия обновления для PostgreSQL
+  strategy:
+    type: Recreate  # Используем Recreate, т.к. PostgreSQL не любит RollingUpdate
+  # Шаблон пода
+  template:
+    metadata:
+      labels:
+        app: postgres
+        lab: lab2
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine  # Официальный образ PostgreSQL
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "secret"  # Должен совпадать с DB_PASSWORD в Go-App
+        - name: POSTGRES_DB
+          value: "myapp"   # Должен совпадать с DB_NAME в Go-App
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        # Проверка готовности PostgreSQL
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - myapp
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 3
+        # Проверка жизнеспособности PostgreSQL
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - myapp
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        emptyDir: {}  # Для тестов. В продакшене используйте PersistentVolume
