@@ -24,4 +24,3 @@ spec:
         image: nginx:alpine
         ports:
         - containerPort: 80
-      

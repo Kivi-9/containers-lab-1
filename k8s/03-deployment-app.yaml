@@ -28,12 +28,12 @@ spec:
       - name: ghcr-secret
       containers:
       - name: go-app
-        image: ghcr.io/kivi-9/containers-lab-1/app:sha-4cea3f8 #тут должна быть ссылка на ващ образ с бэкендом на golang!
+        image: ghcr.io/kivi-9/containers-lab-1/app:sha-4cea3f8  # тут должна быть ссылка на образ с бэкендом на golang!
         ports:
         - containerPort: 8080
         env:
         - name: DB_HOST
-          value: "postgres-service" # будем использовать имя сервиса
+          value: "postgres-service"  # будем использовать имя сервиса
         - name: DB_PORT
           value: "5432"
         - name: DB_USER
