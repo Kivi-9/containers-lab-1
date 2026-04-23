@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'k8s/**/*.yaml'
-      - '.github/workflows/k8s-validate.yml'
   pull_request:
     paths:
       - 'k8s/**/*.yaml'
@@ -13,23 +12,20 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Lint YAML files
+    - name: YAML Lint
       uses: ibiqlik/action-yamllint@v3
       with:
         file_or_dir: k8s/
         config_file: .yamllint.yml
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'v1.28.0'
-
-    - name: Dry-run apply (kubectl validation)
+    - name: Install kubeconform
       run: |
-        for file in k8s/*.yaml; do
-          echo "Validating $file"
-          kubectl apply --dry-run=client -f $file
-        done
+        wget https://github.com/yannh/kubeconform/releases/download/v0.6.3/kubeconform-linux-amd64.tar.gz
+        tar xf kubeconform-linux-amd64.tar.gz
+        sudo mv kubeconform /usr/local/bin/
+
+    - name: Validate with kubeconform
+      run: |
+        kubeconform -strict -kubernetes-version 1.28.0 k8s/*.yaml
