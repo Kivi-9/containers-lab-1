@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'k8s/**/*.yaml'
+      - '.github/workflows/k8s-validate.yml'
   pull_request:
     paths:
       - 'k8s/**/*.yaml'
@@ -26,9 +27,9 @@ jobs:
         wget https://github.com/instrumenta/kubeval/releases/download/v0.16.1/kubeval-linux-amd64.tar.gz
         tar xf kubeval-linux-amd64.tar.gz
         sudo cp kubeval /usr/local/bin
-        kubeval --version  # Проверка установки
+        kubeval --version
 
-    - name: Validate with kubeval
+    - name: Validate Kubernetes manifests with kubeval
       run: |
         for file in k8s/*.yaml; do
           echo "Validating $file"
